@@ -10,6 +10,7 @@ import CreateJob from "./pages/CreateJob";
 import OpenJobs from "./pages/OpenJobs";
 import MyClientJobs from "./pages/MyClientJobs";
 import CompleteProfile from "./pages/CompleteProfile";
+import MyWorkerJobs from "./pages/MyWorkerJobs";
 
 
 function App() {
@@ -68,6 +69,15 @@ function App() {
   element={
     <Guardroute>
       <CompleteProfile />
+    </Guardroute>
+  }
+/>
+
+<Route
+  path="/my-jobs"
+  element={
+    <Guardroute>
+      <MyWorkerJobs />
     </Guardroute>
   }
 />

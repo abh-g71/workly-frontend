@@ -32,6 +32,10 @@ function Dashboard() {
           <button onClick={() => navigate("/open-jobs")}>
             View Open Jobs
           </button>
+
+          <a href="/my-jobs">
+  <          button>My Jobs</button>
+          </a>
         </div>
       )}
 

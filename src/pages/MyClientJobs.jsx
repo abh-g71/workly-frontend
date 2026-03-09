@@ -1,5 +1,6 @@
 import { useEffect, useState, useContext } from "react";
 import AuthContext from "../context/AuthContext";
+import StatusBadge from "../components/StatusBadge";
 
 function MyClientJobs() {
   const { user } = useContext(AuthContext);
@@ -139,7 +140,9 @@ function MyClientJobs() {
             }}
           >
             <h3>{job.title}</h3>
-            <p>Status: {job.status}</p>
+            <p>
+               Status: <StatusBadge status={job.status} />
+            </p>
 
             {/* Mark Complete */}
             {job.status === "IN_PROGRESS" && (
