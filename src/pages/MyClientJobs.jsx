@@ -134,9 +134,13 @@ function MyClientJobs() {
           <div
             key={job._id}
             style={{
-              border: "1px solid black",
-              margin: "10px",
-              padding: "10px",
+              border: "1px solid #e5e7eb",
+              borderRadius: "12px",
+              margin: "12px 0",
+              padding: "18px",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+              background: "#ffffff",
+              color: "#1f2937"
             }}
           >
             <h3>{job.title}</h3>
@@ -164,18 +168,28 @@ function MyClientJobs() {
               </button>
             )}
 
+            {job.assignedWorker && (
+              <p>
+                Worker Rating: ⭐ {job.assignedWorker.rating?.toFixed(1) || "0"}
+                ({job.assignedWorker.ratingCount || 0} reviews)
+              </p>
+            )}
+
             <h4>Applications:</h4>
 
             {job.applications && job.applications.length > 0 ? (
               job.applications.map((app, index) => (
                 <div key={index} style={{ marginBottom: "5px" }}>
-                  Worker ID: {app.worker}
+                  <p>
+                    Worker: {app.worker.name} ⭐ {app.worker.rating?.toFixed(1) || 0}
+                    ({app.worker.ratingCount || 0} reviews)
+                  </p>
 
                   {job.status === "OPEN" && (
                     <button
                       style={{ marginLeft: "10px" }}
                       onClick={() =>
-                        handleAccept(job._id, app.worker)
+                        handleAccept(job._id, app.worker._id)
                       }
                     >
                       Accept

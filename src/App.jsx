@@ -11,11 +11,14 @@ import OpenJobs from "./pages/OpenJobs";
 import MyClientJobs from "./pages/MyClientJobs";
 import CompleteProfile from "./pages/CompleteProfile";
 import MyWorkerJobs from "./pages/MyWorkerJobs";
+import Navbar from "./components/NavBar";
 
 
 function App() {
 
   return (
+    <>
+       <Navbar/>
         <Routes>
   <Route path="/login" element={<Login />} />
   <Route path="/register" element={<Register />} />
@@ -83,6 +86,7 @@ function App() {
 />
 
 </Routes>
+</>
   );
 
   
