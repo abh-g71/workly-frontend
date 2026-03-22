@@ -1,6 +1,7 @@
 import { useEffect, useState, useContext } from "react";
 import AuthContext from "../context/AuthContext";
 import StatusBadge from "../components/StatusBadge";
+import socket from "../socket";
 
 function MyClientJobs() {
   const { user } = useContext(AuthContext);
@@ -30,6 +31,10 @@ function MyClientJobs() {
         alert("Server error");
       }
     };
+
+    socket.on("jobUpdated", () => {
+        fetchJobs();
+      });
 
     if (user?.token) {
       fetchJobs();
@@ -189,7 +194,7 @@ function MyClientJobs() {
                     <button
                       style={{ marginLeft: "10px" }}
                       onClick={() =>
-                        handleAccept(job._id, app.worker._id)
+                        handleAccept(job._id, app.worker)
                       }
                     >
                       Accept

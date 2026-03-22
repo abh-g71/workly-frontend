@@ -12,7 +12,8 @@ import MyClientJobs from "./pages/MyClientJobs";
 import CompleteProfile from "./pages/CompleteProfile";
 import MyWorkerJobs from "./pages/MyWorkerJobs";
 import Navbar from "./components/NavBar";
-
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
 
@@ -86,7 +87,10 @@ function App() {
 />
 
 </Routes>
+
+<ToastContainer />
 </>
+
   );
 
   
