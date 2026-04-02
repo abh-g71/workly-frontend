@@ -1,5 +1,3 @@
-//console.log("ProtectedRoute file loaded");
-
 import { Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
@@ -14,86 +12,92 @@ import MyWorkerJobs from "./pages/MyWorkerJobs";
 import Navbar from "./components/NavBar";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Notifications from "./pages/Notifications";
 
 function App() {
-
   return (
     <>
-       <Navbar/>
-        <Routes>
-  <Route path="/login" element={<Login />} />
-  <Route path="/register" element={<Register />} />
+      <Navbar />
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
 
-  <Route
-    path="/"
-    element={
-      <Guardroute>
-        <Home />
-      </Guardroute>
-    }
-  />
+        <Route
+          path="/"
+          element={
+            <Guardroute>
+              <Home />
+            </Guardroute>
+          }
+        />
 
-  <Route
-    path="/dashboard"
-    element={
-      <Guardroute>
-        <Dashboard />
-      </Guardroute>
-    }
-  />
+        <Route
+          path="/dashboard"
+          element={
+            <Guardroute>
+              <Dashboard />
+            </Guardroute>
+          }
+        />
 
-  <Route
-    path="/create-job"
-    element={
-      <Guardroute>
-        <CreateJob />
-      </Guardroute>
-    }
-  />
-  
-  <Route
-  path="/open-jobs"
-  element={
-    <Guardroute>
-      <OpenJobs />
-    </Guardroute>
-  }
-/>
-  <Route
-  path="/my-jobs"
-  element={
-    <Guardroute>
-      <MyClientJobs />
-    </Guardroute>
-  }
-/>
+        <Route
+          path="/create-job"
+          element={
+            <Guardroute>
+              <CreateJob />
+            </Guardroute>
+          }
+        />
 
-<Route
-  path="/complete-profile"
-  element={
-    <Guardroute>
-      <CompleteProfile />
-    </Guardroute>
-  }
-/>
+        <Route
+          path="/open-jobs"
+          element={
+            <Guardroute>
+              <OpenJobs />
+            </Guardroute>
+          }
+        />
 
-<Route
-  path="/my-jobs"
-  element={
-    <Guardroute>
-      <MyWorkerJobs />
-    </Guardroute>
-  }
-/>
+        <Route
+          path="/worker-jobs"
+          element={
+            <Guardroute>
+              <MyWorkerJobs />
+            </Guardroute>
+          }
+        />
 
-</Routes>
+        <Route
+          path="/complete-profile"
+          element={
+            <Guardroute>
+              <CompleteProfile />
+            </Guardroute>
+          }
+        />
 
-<ToastContainer />
-</>
+        <Route
+          path="/my-jobs"
+          element={
+            <Guardroute>
+              <MyClientJobs />
+            </Guardroute>
+          }
+        />
 
+        <Route
+          path="/notifications"
+          element={
+            <Guardroute>
+              <Notifications />
+            </Guardroute>
+          }
+        />
+      </Routes>
+
+      <ToastContainer />
+    </>
   );
-
-  
 }
 
 export default App;

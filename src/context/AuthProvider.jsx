@@ -3,26 +3,19 @@ import AuthContext from "./AuthContext";
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
-    const token = localStorage.getItem("token");
-    const role = localStorage.getItem("role");
+  const storedUser = localStorage.getItem("user");
+  return storedUser ? JSON.parse(storedUser) : null;
+});
 
-    if (token && role) {
-      return { token, role };
-    }
-    return null;
-  });
+const login = (userData) => {
+  localStorage.setItem("user", JSON.stringify(userData));
+  setUser(userData);
+};
 
-  const login = (token, role) => {
-    localStorage.setItem("token", token);
-    localStorage.setItem("role", role);
-    setUser({ token, role });
-  };
-
-  const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("role");
-    setUser(null);
-  };
+const logout = () => {
+  localStorage.removeItem("user");
+  setUser(null);
+};
 
   return (
     <AuthContext.Provider value={{ user, login, logout }}>

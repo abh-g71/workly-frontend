@@ -36,31 +36,7 @@ function MyWorkerJobs() {
     }
   }, [user]);
 
-  const handleComplete = async (jobId) => {
-    try {
-      const res = await fetch(
-        `http://localhost:8000/api/jobs/${jobId}/complete`,
-        {
-          method: "PUT",
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        }
-      );
-
-      const data = await res.json();
-
-      if (res.ok) {
-        alert("Job marked as completed");
-        window.location.reload();
-      } else {
-        alert(data.message || "Failed to complete job");
-      }
-    } catch (error) {
-      console.error(error);
-      alert("Server error");
-    }
-  };
+  
 
   return (
     <div>
@@ -84,9 +60,9 @@ function MyWorkerJobs() {
            </p>
 
             {job.status === "IN_PROGRESS" && (
-              <button onClick={() => handleComplete(job._id)}>
-                Mark as Completed
-              </button>
+              <p style={{ color: "#f59e0b", fontWeight: "bold" }}>
+                ⏳ Job in progress — client will mark it complete
+              </p>
             )}
           </div>
         ))

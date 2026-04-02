@@ -32,13 +32,14 @@ function MyClientJobs() {
       }
     };
 
-    socket.on("jobUpdated", () => {
-        fetchJobs();
-      });
-
     if (user?.token) {
       fetchJobs();
+      socket.on("jobUpdated", fetchJobs);
     }
+
+    return () => {
+      socket.off("jobUpdated", fetchJobs);
+    };
   }, [user]);
 
   const handleAccept = async (jobId, workerId) => {
@@ -194,7 +195,7 @@ function MyClientJobs() {
                     <button
                       style={{ marginLeft: "10px" }}
                       onClick={() =>
-                        handleAccept(job._id, app.worker)
+                        handleAccept(job._id, app.worker._id)
                       }
                     >
                       Accept
