@@ -6,6 +6,10 @@ import { toast } from "react-toastify";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
+import Card from "../components/ui/Card";
+import Button from "../components/ui/Button";
+import SkeletonCard from "../components/ui/SkeletonCard";
+import EmptyState from "../components/ui/EmptyState";
 
 // Fix default marker icon
 delete L.Icon.Default.prototype._getIconUrl;
@@ -18,7 +22,8 @@ L.Icon.Default.mergeOptions({
 function OpenJobs() {
   const { user } = useContext(AuthContext);
   const [jobs, setJobs] = useState([]);
-  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [applyingId, setApplyingId] = useState(null);
   const [newJobIds, setNewJobIds] = useState([]);
   const [expandedMap, setExpandedMap] = useState(null);
   const audioRef = useRef(null);
@@ -59,6 +64,8 @@ function OpenJobs() {
         if (res.ok) setJobs(data.jobs);
       } catch (error) {
         console.error(error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -90,6 +97,7 @@ function OpenJobs() {
   }, [user]);
 
   const handleApply = async (jobId) => {
+    setApplyingId(jobId);
     try {
       const res = await fetch(`http://localhost:8000/api/jobs/apply/${jobId}`, {
         method: "POST",
@@ -97,13 +105,15 @@ function OpenJobs() {
       });
       const data = await res.json();
       if (res.ok) {
-        setMessage("Applied Successfully ✅");
+        toast.success("Applied Successfully! ✅");
       } else {
-        setMessage(data.message || "Failed to apply ❌");
+        toast.error(data.message || "Failed to apply");
       }
     } catch (error) {
       console.error(error);
-      setMessage("Server error ❌");
+      toast.error("Server error");
+    } finally {
+      setApplyingId(null);
     }
   };
 
@@ -114,122 +124,135 @@ function OpenJobs() {
     );
   };
 
-  return (
-    <div style={{ padding: "20px" }}>
-      <h2>Open Jobs</h2>
+  if (loading) {
+    return (
+      <div className="page-container">
+        <h1 className="page-title">Open Jobs</h1>
+        <SkeletonCard count={4} />
+      </div>
+    );
+  }
 
-      {message && (
-        <div
-          style={{
-            marginBottom: "15px",
-            padding: "10px",
-            backgroundColor: message.includes("❌") ? "#fee2e2" : "#dcfce7",
-            color: message.includes("❌") ? "#b91c1c" : "#166534",
-            borderRadius: "6px",
-            fontWeight: "500",
-          }}
-        >
-          {message}
-        </div>
-      )}
+  return (
+    <div className="page-container">
+      <h1 className="page-title">Open Jobs</h1>
 
       {jobs.length === 0 ? (
-        <p>No open jobs available.</p>
+        <EmptyState
+          icon="🔍"
+          title="No open jobs"
+          description="There are no jobs available right now. New jobs will appear here in real time."
+        />
       ) : (
-        jobs.map((job) => (
-          <div
-            key={job._id}
-            style={{
-              border: "1px solid #e5e7eb",
-              borderRadius: "12px",
-              margin: "12px 0",
-              padding: "18px",
-              boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
-              backgroundColor: newJobIds.includes(job._id) ? "#d1fae5" : "white",
-              transition: "0.5s",
-            }}
-          >
-            <h3>{job.title}</h3>
-            <p>{job.description}</p>
-            <p><strong>Location:</strong> {job.location}</p>
-            <p><strong>Budget:</strong> ₹{job.budget}</p>
-            <p><MatchBadge percentage={job.matchPercentage} /></p>
-            <p><strong>Client:</strong> {job.client?.name}</p>
-
-            {/* Buttons Row */}
-            <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginTop: "10px" }}>
-              <button
-                onClick={() => handleApply(job._id)}
-                style={{
-                  backgroundColor: "#3b82f6",
-                  color: "white",
-                  padding: "8px 16px",
-                  border: "none",
-                  borderRadius: "8px",
-                  cursor: "pointer",
-                }}
-              >
-                Apply
-              </button>
-
-              {/* Show map button only if coordinates exist */}
-              {job.coordinates?.lat && (
-                <>
-                  <button
-                    onClick={() =>
-                      setExpandedMap(expandedMap === job._id ? null : job._id)
-                    }
-                    style={{
-                      backgroundColor: "#8b5cf6",
-                      color: "white",
-                      padding: "8px 16px",
-                      border: "none",
-                      borderRadius: "8px",
-                      cursor: "pointer",
-                    }}
-                  >
-                    {expandedMap === job._id ? "Hide Map 🗺️" : "View Location 🗺️"}
-                  </button>
-
-                  <button
-                    onClick={() =>
-                      handleNavigate(job.coordinates.lat, job.coordinates.lng)
-                    }
-                    style={{
-                      backgroundColor: "#10b981",
-                      color: "white",
-                      padding: "8px 16px",
-                      border: "none",
-                      borderRadius: "8px",
-                      cursor: "pointer",
-                    }}
-                  >
-                    Navigate 🧭
-                  </button>
-                </>
-              )}
-            </div>
-
-            {/* Map Preview */}
-            {expandedMap === job._id && job.coordinates?.lat && (
-              <div style={{ marginTop: "15px" }}>
-                <MapContainer
-                  center={[job.coordinates.lat, job.coordinates.lng]}
-                  zoom={15}
-                  style={{ height: "250px", width: "100%", borderRadius: "12px" }}
-                >
-                  <TileLayer
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    attribution='&copy; OpenStreetMap contributors'
-                  />
-                  <Marker position={[job.coordinates.lat, job.coordinates.lng]}>
-                    <Popup>{job.title} — {job.location}</Popup>
-                  </Marker>
-                </MapContainer>
+        <div className="space-y-4">
+          {jobs.map((job) => (
+            <Card
+              key={job._id}
+              flash={newJobIds.includes(job._id)}
+              className="animate-fade-in"
+            >
+              {/* Header */}
+              <div className="flex items-start justify-between gap-3 mb-3">
+                <h3 className="text-lg font-bold text-txt-primary leading-tight">{job.title}</h3>
+                <MatchBadge percentage={job.matchPercentage} />
               </div>
-            )}
-          </div>
-        ))
+
+              {/* Description */}
+              <p className="text-sm text-txt-secondary mb-4 line-clamp-2">{job.description}</p>
+
+              {/* Skills Chips */}
+              {job.requiredSkills && job.requiredSkills.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 mb-4">
+                  {job.requiredSkills.map((skill, idx) => (
+                    <span
+                      key={idx}
+                      className="px-2 py-0.5 bg-navy-900 border border-navy-700 rounded-full text-xs text-txt-secondary"
+                    >
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              {/* Details */}
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-4 text-sm">
+                <div className="flex items-center gap-1.5 text-txt-secondary">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  <span className="truncate max-w-[200px]">{job.location}</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-success font-semibold">₹{job.budget}</span>
+                </div>
+                <div className="flex items-center gap-1.5 text-txt-secondary">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                  <span>{job.client?.name}</span>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={() => handleApply(job._id)}
+                  loading={applyingId === job._id}
+                >
+                  Apply Now
+                </Button>
+
+                {job.coordinates?.lat && (
+                  <>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => setExpandedMap(expandedMap === job._id ? null : job._id)}
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                      </svg>
+                      {expandedMap === job._id ? "Hide Map" : "View Location"}
+                    </Button>
+
+                    <Button
+                      variant="success"
+                      size="sm"
+                      onClick={() => handleNavigate(job.coordinates.lat, job.coordinates.lng)}
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                      </svg>
+                      Navigate
+                    </Button>
+                  </>
+                )}
+              </div>
+
+              {/* Map Preview */}
+              {expandedMap === job._id && job.coordinates?.lat && (
+                <div className="mt-4 rounded-2xl overflow-hidden border border-navy-700 animate-fade-in">
+                  <MapContainer
+                    center={[job.coordinates.lat, job.coordinates.lng]}
+                    zoom={15}
+                    style={{ height: "220px", width: "100%" }}
+                  >
+                    <TileLayer
+                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                      attribution='&copy; OpenStreetMap contributors'
+                    />
+                    <Marker position={[job.coordinates.lat, job.coordinates.lng]}>
+                      <Popup>{job.title} — {job.location}</Popup>
+                    </Marker>
+                  </MapContainer>
+                </div>
+              )}
+            </Card>
+          ))}
+        </div>
       )}
     </div>
   );

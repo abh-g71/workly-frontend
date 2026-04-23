@@ -1,10 +1,15 @@
 import { useEffect, useState, useContext } from "react";
 import AuthContext from "../context/AuthContext";
 import socket from "../socket";
+import Card from "../components/ui/Card";
+import Button from "../components/ui/Button";
+import SkeletonCard from "../components/ui/SkeletonCard";
+import EmptyState from "../components/ui/EmptyState";
 
 function Notifications() {
   const { user } = useContext(AuthContext);
   const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const fetchNotifications = async () => {
     try {
@@ -15,6 +20,8 @@ function Notifications() {
       if (res.ok) setNotifications(data.notifications);
     } catch (error) {
       console.error(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -44,9 +51,7 @@ function Notifications() {
 
   useEffect(() => {
     if (user?.token) fetchNotifications();
-
     socket.on("notificationUpdated", fetchNotifications);
-
     return () => socket.off("notificationUpdated", fetchNotifications);
   }, [user]);
 
@@ -61,67 +66,84 @@ function Notifications() {
     }
   };
 
+  const timeAgo = (dateStr) => {
+    const now = new Date();
+    const date = new Date(dateStr);
+    const seconds = Math.floor((now - date) / 1000);
+
+    if (seconds < 60) return 'Just now';
+    if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+    if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+    if (seconds < 604800) return `${Math.floor(seconds / 86400)}d ago`;
+    return date.toLocaleDateString();
+  };
+
+  if (loading) {
+    return (
+      <div className="page-container max-w-2xl">
+        <h1 className="page-title">Notifications</h1>
+        <SkeletonCard count={5} />
+      </div>
+    );
+  }
+
   return (
-    <div style={{ padding: "20px", maxWidth: "600px", margin: "0 auto" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <h2>🔔 Notifications</h2>
+    <div className="page-container max-w-2xl">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <h1 className="text-2xl font-bold text-txt-primary">Notifications</h1>
+          {notifications.filter(n => !n.read).length > 0 && (
+            <span className="px-2 py-0.5 bg-accent-indigo/15 text-accent-indigo text-xs font-bold rounded-full">
+              {notifications.filter(n => !n.read).length} new
+            </span>
+          )}
+        </div>
         {notifications.some((n) => !n.read) && (
-          <button
-            onClick={handleMarkAllRead}
-            style={{
-              backgroundColor: "#3b82f6",
-              color: "white",
-              padding: "8px 16px",
-              border: "none",
-              borderRadius: "8px",
-              cursor: "pointer",
-            }}
-          >
+          <Button variant="ghost" size="sm" onClick={handleMarkAllRead}>
             Mark All Read
-          </button>
+          </Button>
         )}
       </div>
 
       {notifications.length === 0 ? (
-        <p>No notifications yet.</p>
+        <EmptyState
+          icon="🔔"
+          title="No notifications"
+          description="You're all caught up! New notifications will appear here when there's activity on your jobs."
+        />
       ) : (
-        notifications.map((n) => (
-          <div
-            key={n._id}
-            onClick={() => !n.read && handleMarkRead(n._id)}
-            style={{
-              padding: "14px",
-              margin: "10px 0",
-              borderRadius: "10px",
-              backgroundColor: n.read ? "#f9fafb" : "#eff6ff",
-              border: n.read ? "1px solid #e5e7eb" : "1px solid #93c5fd",
-              cursor: n.read ? "default" : "pointer",
-              display: "flex",
-              gap: "12px",
-              alignItems: "flex-start",
-            }}
-          >
-            <span style={{ fontSize: "24px" }}>{getIcon(n.type)}</span>
-            <div style={{ flex: 1 }}>
-              <p style={{ margin: 0, fontWeight: n.read ? "normal" : "bold" }}>
-                {n.message}
-              </p>
-              <p style={{ margin: "4px 0 0", fontSize: "12px", color: "#6b7280" }}>
-                {new Date(n.createdAt).toLocaleString()}
-              </p>
+        <div className="space-y-2">
+          {notifications.map((n) => (
+            <div
+              key={n._id}
+              onClick={() => !n.read && handleMarkRead(n._id)}
+              className={`
+                flex items-start gap-3 p-4 rounded-2xl border transition-all duration-200
+                ${n.read
+                  ? 'bg-navy-800/50 border-navy-700/50'
+                  : 'bg-navy-800 border-l-4 border-l-accent-indigo border-t-navy-700 border-r-navy-700 border-b-navy-700 cursor-pointer hover:bg-navy-800/80'
+                }
+              `}
+            >
+              {/* Icon */}
+              <span className="text-xl flex-shrink-0 mt-0.5">{getIcon(n.type)}</span>
+
+              {/* Content */}
+              <div className="flex-1 min-w-0">
+                <p className={`text-sm leading-relaxed ${n.read ? 'text-txt-secondary' : 'text-txt-primary font-medium'}`}>
+                  {n.message}
+                </p>
+                <p className="text-xs text-txt-muted mt-1">{timeAgo(n.createdAt)}</p>
+              </div>
+
+              {/* Unread dot */}
+              {!n.read && (
+                <div className="w-2 h-2 rounded-full bg-accent-indigo animate-pulse-dot flex-shrink-0 mt-2" />
+              )}
             </div>
-            {!n.read && (
-              <span style={{
-                width: "10px",
-                height: "10px",
-                borderRadius: "50%",
-                backgroundColor: "#3b82f6",
-                marginTop: "5px",
-                flexShrink: 0,
-              }} />
-            )}
-          </div>
-        ))
+          ))}
+        </div>
       )}
     </div>
   );
