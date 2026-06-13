@@ -18,7 +18,7 @@ function Register() {
     setError("");
 
     try {
-      const res = await fetch("http://localhost:5173/api/users/register", {
+      const res = await fetch("http://localhost:8000/api/users/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, phone, password, role }),
