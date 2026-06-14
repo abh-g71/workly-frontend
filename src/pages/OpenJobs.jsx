@@ -57,7 +57,7 @@ function OpenJobs() {
 
     const fetchJobs = async () => {
       try {
-        const res = await fetch("http://localhost:8000/api/jobs/open", {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/jobs/open`, {
           headers: { Authorization: `Bearer ${user.token}` },
         });
         const data = await res.json();
@@ -79,7 +79,7 @@ function OpenJobs() {
 
   try {
     const res = await fetch(
-      "http://localhost:8000/api/jobs/open",
+      `${import.meta.env.VITE_API_URL}/api/jobs/open`,
       {
         headers: {
           Authorization: `Bearer ${user.token}`,
@@ -109,7 +109,7 @@ function OpenJobs() {
   const handleApply = async (jobId) => {
     setApplyingId(jobId);
     try {
-      const res = await fetch(`http://localhost:8000/api/jobs/apply/${jobId}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/jobs/apply/${jobId}`, {
         method: "POST",
         headers: { Authorization: `Bearer ${user.token}` },
       });
