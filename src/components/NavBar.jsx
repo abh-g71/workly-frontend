@@ -50,17 +50,25 @@ function Navbar() {
     }
   };
 
-  useEffect(() => {
-    if (user?.token) fetchUnreadCount();
+ useEffect(() => {
+  if (user?.token) {
+    fetchUnreadCount();
+  }
 
-    const handleNotification = () => {
-      fetchUnreadCount();
+  const handleNotification = (data) => {
+    fetchUnreadCount();
+
+    if (data?.type === "NEW_JOB") {
       playSound();
-    };
+    }
+  };
 
-    socket.on("notificationUpdated", handleNotification);
-    return () => socket.off("notificationUpdated", handleNotification);
-  }, [user]);
+  socket.on("notificationUpdated", handleNotification);
+
+  return () => {
+    socket.off("notificationUpdated", handleNotification);
+  };
+}, [user]);
 
   // Hide navbar on login/register pages
   if (['/login', '/register'].includes(location.pathname)) return null;

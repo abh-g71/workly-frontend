@@ -69,26 +69,36 @@ function OpenJobs() {
       }
     };
 
-    const handleUpdate = async () => {
-      console.log("🔥 jobUpdated received");
-      toast.info("🆕 New job available!");
-      playSound();
+      const handleUpdate = async (data) => {
+  console.log("🔥 jobUpdated received");
 
-      try {
-        const res = await fetch("http://localhost:8000/api/jobs/open", {
-          headers: { Authorization: `Bearer ${user.token}` },
-        });
-        const data = await res.json();
-        if (res.ok) {
-          const newIds = data.jobs.map((job) => job._id);
-          setNewJobIds(newIds);
-          setJobs(data.jobs);
-          setTimeout(() => setNewJobIds([]), 3000);
-        }
-      } catch (error) {
-        console.error(error);
+  if (data?.type === "NEW_JOB") {
+    toast.info("🆕 New job available!");
+    playSound();
+  }
+
+  try {
+    const res = await fetch(
+      "http://localhost:8000/api/jobs/open",
+      {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
       }
-    };
+    );
+
+    const data = await res.json();
+
+    if (res.ok) {
+      const newIds = data.jobs.map((job) => job._id);
+      setNewJobIds(newIds);
+      setJobs(data.jobs);
+      setTimeout(() => setNewJobIds([]), 3000);
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
 
     socket.on("jobUpdated", handleUpdate);
     fetchJobs();
