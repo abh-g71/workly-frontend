@@ -17,7 +17,7 @@ function Login() {
     setError("");
 
     try {
-      const res = await fetch("http://localhost:8000/api/users/login", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/users/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ phone, password }),
@@ -28,7 +28,7 @@ function Login() {
       if (res.ok) {
         const token = data.token;
 
-        const resUser = await fetch("http://localhost:8000/api/users/me", {
+        const resUser = await fetch(`${import.meta.env.VITE_API_URL}/api/users/me`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const userData = await resUser.json();

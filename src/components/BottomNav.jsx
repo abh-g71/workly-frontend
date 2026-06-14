@@ -12,7 +12,7 @@ function BottomNav() {
   const fetchUnreadCount = async () => {
     if (!user?.token) return;
     try {
-      const res = await fetch("http://localhost:8000/api/notifications/unread-count", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/notifications/unread-count`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       const data = await res.json();

@@ -76,7 +76,7 @@ function CreateJob() {
     setSubmitLoading(true);
 
     try {
-      const res = await fetch("http://localhost:8000/api/jobs/create", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/jobs/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

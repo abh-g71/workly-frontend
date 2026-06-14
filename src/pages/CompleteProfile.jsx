@@ -21,7 +21,7 @@ function CompleteProfile() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const res = await fetch("http://localhost:8000/api/workers/me", {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/workers/me`, {
           headers: { Authorization: `Bearer ${user.token}` },
         });
         const data = await res.json();
@@ -50,8 +50,8 @@ function CompleteProfile() {
     setLoading(true);
 
     const url = hasProfile
-      ? "http://localhost:8000/api/workers/update"
-      : "http://localhost:8000/api/workers/create";
+      ? `${import.meta.env.VITE_API_URL}/api/workers/update`
+      : `${import.meta.env.VITE_API_URL}/api/workers/create`;
 
     const method = hasProfile ? "PUT" : "POST";
 

@@ -16,7 +16,7 @@ function MyWorkerJobs() {
   useEffect(() => {
     const fetchJobs = async () => {
       try {
-        const res = await fetch("http://localhost:8000/api/jobs/my-jobs", {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/jobs/my-jobs`, {
           headers: { Authorization: `Bearer ${user.token}` },
         });
         const data = await res.json();

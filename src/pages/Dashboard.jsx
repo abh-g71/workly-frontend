@@ -13,7 +13,7 @@ function Dashboard() {
       if (user?.role !== "worker") return;
 
       try {
-        const res = await fetch("http://localhost:8000/api/workers/me", {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/workers/me`, {
           headers: {
             Authorization: `Bearer ${user.token}`,
           },

@@ -24,7 +24,7 @@ function MyClientJobs() {
 
   const fetchJobs = async () => {
     try {
-      const res = await fetch("http://localhost:8000/api/jobs/my-client-jobs", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/jobs/my-client-jobs`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       const data = await res.json();
@@ -53,7 +53,7 @@ function MyClientJobs() {
     const { jobId, workerId } = acceptModal;
     setActionLoading('accept');
     try {
-      const res = await fetch(`http://localhost:8000/api/jobs/${jobId}/accept/${workerId}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/jobs/${jobId}/accept/${workerId}`, {
         method: "PUT",
         headers: { Authorization: `Bearer ${user.token}` },
       });
@@ -77,7 +77,7 @@ function MyClientJobs() {
     const { jobId } = completeModal;
     setActionLoading('complete');
     try {
-      const res = await fetch(`http://localhost:8000/api/jobs/${jobId}/complete`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/jobs/${jobId}/complete`, {
         method: "PUT",
         headers: { Authorization: `Bearer ${user.token}` },
       });
@@ -105,7 +105,7 @@ function MyClientJobs() {
     }
     setActionLoading('rate');
     try {
-      const res = await fetch(`http://localhost:8000/api/jobs/${jobId}/rate`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/jobs/${jobId}/rate`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

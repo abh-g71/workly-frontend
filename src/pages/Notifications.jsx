@@ -13,7 +13,7 @@ function Notifications() {
 
   const fetchNotifications = async () => {
     try {
-      const res = await fetch("http://localhost:8000/api/notifications", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/notifications`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       const data = await res.json();
@@ -27,7 +27,7 @@ function Notifications() {
 
   const handleMarkAllRead = async () => {
     try {
-      await fetch("http://localhost:8000/api/notifications/mark-all-read", {
+      await fetch(`${import.meta.env.VITE_API_URL}/api/notifications/mark-all-read`, {
         method: "PUT",
         headers: { Authorization: `Bearer ${user.token}` },
       });
@@ -39,7 +39,7 @@ function Notifications() {
 
   const handleMarkRead = async (id) => {
     try {
-      await fetch(`http://localhost:8000/api/notifications/${id}/read`, {
+      await fetch(`${import.meta.env.VITE_API_URL}/api/notifications/${id}/read`, {
         method: "PUT",
         headers: { Authorization: `Bearer ${user.token}` },
       });
